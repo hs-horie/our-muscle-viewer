@@ -1,0 +1,36 @@
+name: push builder
+run-name: auto build when pushed or manual
+# ジョブの並列実行管理
+concurrency:
+  # 同一グループにすることで並列実行時の振る舞いを管理
+  group: ${{ github.workflow }}
+  # 同一グループで実行が被った場合ジョブをキャンセルする
+  cancel-in-progress: true
+on:
+  # 指定ブランチへpushした時にジョブを実行する
+  push:
+    # masterブランチを対象
+    # リストにすることで複数指定可能
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "手動実行のメッセージ"
+        required: true
+        type: string
+      environment:
+        description: "手動実行の環境"
+        required: false
+        type: string
+        default: "staging"
+env:
+  MUSCLE_DOUBLE: 'ダブルバイセップス'
+  MUSCLE_SIDE: 'サイドチェスト'
+  MUSCLE_MOST: 'モストマスキュラー'
+jobs:
+  # 実行するyamlのパスを記載する
+  common-build:
+    uses: ./.github/workflows/common_build.yml
+    with:
+      message: ${{ inputs.message }}
+      environment: ${{ inputs.environment }}

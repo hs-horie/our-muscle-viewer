@@ -1,0 +1,13 @@
+name: echo pose
+description: "メッセージを表示するだけのアクション"
+inputs:
+  message:
+    description: "メッセージを入力"
+    required: true
+    default: "やーーーーーー!!!!!!!!"
+runs:
+  using: "composite"
+  steps:
+    - name: Echo Pose
+      run: echo "${{ inputs.message }}"
+      shell: bash

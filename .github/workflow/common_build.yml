@@ -1,0 +1,61 @@
+name: common builder
+# push または pull_request イベントによってトリガーされるワークフローの場合、コミット メッセージまたは pull request のタイトルとして設定されます。
+run-name: common runner
+# ジョブが実行されるトリガーを記載していく
+on:
+  # 別のワークフローからワークフローを呼び出すことができる
+  workflow_call:
+    # jobの実行に必要となるパラメータを入力する。
+    # https://docs.github.com/ja/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs#inputs-context
+    # 外部ワークフローからから入力がある時 inputs.xxx で指定する。
+    inputs:
+      # 任意で定義できる
+      message:
+        description: "ログに出力するメッセージ"
+        required: true
+        type: string
+      environment:
+        description: "環境の種類"
+        required: false
+        type: string
+        default: "大胸筋"
+  # コンソール上でワークフローの実行ができるようになる
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "ログに出力するメッセージ"
+        required: true
+        type: string
+      environment:
+        description: "環境の種類"
+        required: false
+        type: string
+        default: "腹斜筋"
+# このファイル中のすべてのジョブのステップで使うことができる変数
+env:
+  MUSCLE_DOUBLE: 'ダブルバイセップス'
+  MUSCLE_SIDE: 'サイドチェスト'
+  MUSCLE_MOST: 'モストマスキュラー'
+jobs:
+  log_message:
+    # ランナーの実行環境（ここではubuntu）
+    # プランによって並列実行ジョブ数が変わる
+    runs-on: ubuntu-latest
+    # Jenkinsのパイプラインみたいなもの
+    # 中で具体的なアクションを定義していく
+    steps:
+      # 任意のアクションの名前をつけれる
+      # run: の中には
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Echo Message
+        run: echo "${{ inputs.message }}"
+      - name: Print Environment
+        run: echo "Environment is ${{ inputs.environment }}"
+      - name: Love Posing
+        run: echo ${{ env.MUSCLE_MOST }}
+      - name: My Custom Pose
+        # ワークフローと同じリポジトリ、パブリックリポジトリ、または公開されているDockerコンテナーイメージで定義されているアクションを使用できる
+        uses: ./.github/actions/echo_pose
+        with:
+          message: "${{ env.MUSCLE_SIDE }}"
